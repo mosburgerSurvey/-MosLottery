@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MOS夏日祭典活動抽獎</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hiragino Sans','Meiryo','Yu Gothic',sans-serif;background:#0d0520;min-height:100vh;color:#fff;overflow-x:hidden}
+.fest-bg{position:fixed;inset:0;z-index:0;background:linear-gradient(180deg,#020010 0%,#0d0520 25%,#1a0835 55%,#250d45 75%,#1a0530 100%);overflow:hidden}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle var(--d,2s) ease-in-out infinite var(--delay,0s)}
+@keyframes twinkle{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:1;transform:scale(1.4)}}
+.ground-glow{position:absolute;bottom:0;left:0;right:0;height:45%;background:linear-gradient(to top,rgba(255,90,0,.18) 0%,rgba(255,140,50,.07) 50%,transparent 100%)}
+.lantern-rope{position:absolute;top:20px;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,#8B6914 8%,#8B6914 92%,transparent)}
+.lantern-row{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-around;padding:0 10px}
+.lantern{display:flex;flex-direction:column;align-items:center;transform-origin:top center;animation:sway var(--sd,3s) ease-in-out infinite var(--delay,0s)}
+.lantern-top{width:2px;height:18px;background:#8B6914}
+.lantern-body{width:30px;height:44px;background:radial-gradient(circle at 38% 32%,#ff7700,#cc1a00);border-radius:38% 38% 46% 46%/28% 28% 38% 38%;box-shadow:0 0 14px rgba(255,100,0,.85),0 0 28px rgba(255,100,0,.35);border:1px solid rgba(255,160,50,.45);position:relative}
+.lantern-body::before,.lantern-body::after{content:'';position:absolute;left:50%;transform:translateX(-50%);width:68%;height:3px;background:rgba(255,200,100,.6);border-radius:2px}
+.lantern-body::before{top:5px}.lantern-body::after{bottom:5px}
+.lantern-tassel{width:2px;height:14px;background:#FFD700;box-shadow:0 0 5px rgba(255,215,0,.55)}
+@keyframes sway{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+
+/* ── 店號登入畫面 ── */
+#store-login{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center}
+.store-login-box{background:linear-gradient(135deg,#1a0830,#2a1050);border:2px solid rgba(255,215,0,.45);border-radius:20px;padding:38px 32px 32px;width:90%;max-width:360px;text-align:center;box-shadow:0 0 70px rgba(255,150,0,.15),0 20px 60px rgba(0,0,0,.7)}
+.store-login-logo{font-size:2.4rem;margin-bottom:10px;filter:drop-shadow(0 0 14px rgba(255,180,0,.6))}
+.store-login-title{font-size:1.15rem;font-weight:900;background:linear-gradient(135deg,#FFD700,#FFA500,#FFE066,#FFD700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 8px rgba(255,200,0,.5));margin-bottom:5px;letter-spacing:.04em}
+.store-login-sub{color:rgba(255,220,150,.6);font-size:.76rem;letter-spacing:.22em;margin-bottom:24px}
+.store-login-divider{width:60px;height:1px;background:linear-gradient(to right,transparent,rgba(255,215,0,.4),transparent);margin:0 auto 18px}
+.store-login-hint{color:rgba(255,255,255,.62);font-size:.84rem;margin-bottom:10px;letter-spacing:.05em}
+.store-login-box .login-inp{font-size:1.3rem;text-align:center;letter-spacing:.25em;padding:12px 16px;margin-bottom:8px}
+.store-login-deco{display:flex;justify-content:center;gap:6px;margin-bottom:20px}
+.store-deco-star{color:rgba(255,215,0,.38);font-size:.7rem}
+
+/* ── 店號標章 ── */
+.store-badge{position:fixed;top:14px;left:14px;z-index:50;background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.28);border-radius:18px;padding:5px 13px;font-size:.74rem;color:rgba(255,215,0,.82);letter-spacing:.08em}
+
+.main{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:90px 16px 50px;gap:16px}
+.title h1{font-size:clamp(1.3rem,4vw,2.2rem);font-weight:900;background:linear-gradient(135deg,#FFD700,#FFA500,#FFE066,#FFD700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 12px rgba(255,200,0,.7));letter-spacing:.06em;text-align:center}
+.title .sub{text-align:center;color:rgba(255,220,150,.75);font-size:.78rem;letter-spacing:.25em;margin-top:4px}
+
+/* ── MACHINE ── */
+.machine-outer{position:relative;display:flex;flex-direction:column;align-items:center}
+.drum-crank-row{display:flex;align-items:center;position:relative;z-index:2}
+.drum-spacer{width:46px;flex-shrink:0}
+.oct-wrap{position:relative;width:220px;height:220px;flex-shrink:0}
+#drum-inner{
+  position:absolute;inset:0;
+  clip-path:polygon(29.5% 0%,70.5% 0%,100% 29.5%,100% 70.5%,70.5% 100%,29.5% 100%,0% 70.5%,0% 29.5%);
+  overflow:hidden;
+  background:
+    repeating-linear-gradient(8deg,transparent 0px,transparent 5px,rgba(120,80,20,.07) 5px,rgba(120,80,20,.07) 6px),
+    repeating-linear-gradient(98deg,transparent 0px,transparent 22px,rgba(100,65,10,.04) 22px,rgba(100,65,10,.04) 23px),
+    linear-gradient(158deg,#f5e8be 0%,#d5b958 22%,#efe0aa 48%,#c8a030 70%,#ddc87a 100%);
+}
+.drum-sticker{position:absolute;top:13px;left:50%;transform:translateX(-50%);width:58px;height:28px;background:rgba(245,235,200,.82);border:1px solid rgba(140,90,30,.55);border-radius:5px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.drum-sticker svg{width:54px;height:24px}
+.drum-window{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:118px;height:118px;border-radius:50%;background:rgba(6,3,20,.8);overflow:hidden;border:3px solid rgba(140,100,25,.55);box-shadow:inset 0 0 18px rgba(0,0,0,.85)}
+.drum-mesh{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 15px,rgba(140,170,255,.07) 15px,rgba(140,170,255,.07) 16px),repeating-linear-gradient(90deg,transparent,transparent 15px,rgba(140,170,255,.07) 15px,rgba(140,170,255,.07) 16px)}
+.drum-balls-layer{position:absolute;inset:0}
+.ball-in-drum{position:absolute;width:20px;height:20px;border-radius:50%;transform:translate(-50%,-50%);box-shadow:inset -3px -3px 6px rgba(0,0,0,.5),inset 2px 2px 5px rgba(255,255,255,.4)}
+.drum-win-shine{position:absolute;inset:0;border-radius:50%;background:radial-gradient(ellipse at 30% 26%,rgba(255,255,255,.14) 0%,transparent 60%);pointer-events:none}
+.oct-frame-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.exit-hole{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);width:22px;height:22px;border-radius:50%;background:#000;border:3px solid #8B6914;box-shadow:inset 0 0 6px rgba(0,0,0,.95);z-index:4}
+.crank-wrap{position:relative;width:46px;height:90px;flex-shrink:0;margin-top:-20px}
+.crank-shaft{position:absolute;top:42px;left:0;width:28px;height:9px;background:linear-gradient(180deg,#dfc050,#906010,#c9a030);border-radius:0 4px 4px 0;box-shadow:0 2px 5px rgba(0,0,0,.4)}
+.crank-arm{position:absolute;top:6px;left:20px;width:9px;height:44px;background:linear-gradient(90deg,#777,#ccc,#aaa,#777);border-radius:5px;box-shadow:2px 0 5px rgba(0,0,0,.35);transform-origin:bottom center;transition:transform .4s ease}
+.crank-arm.push{animation:crankPush .5s ease-out}
+@keyframes crankPush{0%{transform:rotate(0)}40%{transform:rotate(40deg)}100%{transform:rotate(0)}}
+.crank-knob{position:absolute;top:0;left:14px;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 32%,#c07838,#542200);box-shadow:0 0 8px rgba(140,60,0,.5);border:1.5px solid rgba(200,130,60,.45)}
+
+/* ── BASE BOARD ── */
+.base-board{
+  width:440px;max-width:96vw;
+  background:
+    repeating-linear-gradient(90deg,transparent,transparent 38px,rgba(140,100,30,.04) 38px,rgba(140,100,30,.04) 39px),
+    linear-gradient(180deg,#f0e0a8 0%,#d8c068 45%,#c0a040 100%);
+  border-radius:6px 6px 10px 10px;
+  box-shadow:0 8px 28px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,245,190,.4);
+  padding:6px 14px 16px;
+  margin-top:-4px;
+  position:relative;z-index:1;
+}
+.board-inner{display:flex;align-items:flex-end;justify-content:center;gap:0}
+.bell-col{width:80px;flex-shrink:0;display:flex;justify-content:center;align-items:flex-end;padding-bottom:4px}
+.bell-wrap{transform-origin:top center;cursor:pointer}
+.bell-wrap:hover{filter:brightness(1.1)}
+.bell-svg{display:block;width:52px;height:82px}
+@keyframes ringBell{0%{transform:rotate(0)}12%{transform:rotate(-22deg)}24%{transform:rotate(20deg)}36%{transform:rotate(-16deg)}48%{transform:rotate(14deg)}60%{transform:rotate(-9deg)}72%{transform:rotate(7deg)}84%{transform:rotate(-4deg)}100%{transform:rotate(0)}}
+.bell-ringing{animation:ringBell 1.4s ease-out}
+.stand-col{flex:1;display:flex;justify-content:center;align-items:flex-end}
+.stand-svg{width:270px;display:block}
+.tray-col{width:90px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;position:relative;padding-bottom:4px}
+.tray-svg{display:block;width:84px;height:52px}
+#result-ball-wrap{position:absolute;top:-34px;left:50%;transform:translateX(-50%);opacity:0;transition:opacity .2s;display:flex;align-items:center;justify-content:center}
+#result-ball{width:48px;height:48px;border-radius:50%;box-shadow:inset -7px -7px 14px rgba(0,0,0,.5),inset 4px 4px 10px rgba(255,255,255,.45),0 5px 18px rgba(0,0,0,.45);transform:scale(0);transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+#result-ball.pop{transform:scale(1)}
+
+/* ── BUTTONS ── */
+.btn-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center}
+#reset-btn{
+  padding:13px 22px;font-size:.95rem;font-weight:700;font-family:inherit;
+  background:rgba(255,255,255,.08);color:rgba(255,255,255,.82);
+  border:2px solid rgba(255,255,255,.28);border-radius:50px;
+  cursor:pointer;letter-spacing:.08em;transition:all .2s;
+  display:flex;align-items:center;gap:6px;
+}
+#reset-btn:hover{background:rgba(255,255,255,.16);color:#fff;border-color:rgba(255,255,255,.5);transform:translateY(-1px)}
+#reset-btn:active{transform:translateY(1px)}
+#start-btn{
+  padding:14px 30px;font-size:1.15rem;font-weight:900;font-family:inherit;
+  background:linear-gradient(135deg,#bb0000,#ff2222,#bb0000);color:#FFD700;
+  border:3px solid #FFD700;border-radius:50px;cursor:pointer;letter-spacing:.08em;
+  box-shadow:0 0 20px rgba(180,0,0,.55),0 5px 14px rgba(0,0,0,.4);
+  transition:all .2s;display:flex;align-items:center;gap:8px;
+}
+#start-btn:hover:not(:disabled){transform:translateY(-2px) scale(1.03);box-shadow:0 0 30px rgba(180,0,0,.7),0 8px 20px rgba(0,0,0,.4)}
+#start-btn:active:not(:disabled){transform:translateY(1px) scale(.98)}
+#start-btn:disabled{opacity:.55;cursor:not-allowed}
+.btn-candy{flex-shrink:0;display:block}
+
+/* ── PRIZE GRID ── */
+.prize-section{width:440px;max-width:96vw}
+.prize-section-title{color:rgba(255,215,0,.85);font-size:.85rem;letter-spacing:.15em;margin-bottom:10px;text-align:center}
+.prize-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.pcard{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:12px;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;transition:border-color .2s}
+.pcard.off{opacity:.32}
+.pcard-ball{width:32px;height:32px;border-radius:50%;flex-shrink:0;box-shadow:inset -4px -4px 8px rgba(0,0,0,.45),inset 2px 2px 6px rgba(255,255,255,.4)}
+.pcard-name{font-size:.75rem;color:rgba(255,255,255,.6);font-weight:600}
+.pcard-prize-wrap{width:100%;display:flex;align-items:center;justify-content:center;gap:4px;min-height:30px}
+.pcard-prize{font-size:.76rem;color:rgba(255,220,140,.95);text-align:center;cursor:pointer;padding:3px 5px;border-radius:4px;border:1px solid transparent;transition:all .15s;line-height:1.35;word-break:break-all}
+.pcard-prize:hover{background:rgba(255,215,0,.1);border-color:rgba(255,215,0,.3)}
+.pcard-edit-btn{background:none;border:none;cursor:pointer;font-size:.72rem;color:rgba(255,215,0,.4);padding:2px;line-height:1;flex-shrink:0;transition:color .15s}
+.pcard-edit-btn:hover{color:rgba(255,215,0,.9)}
+.pcard-sold-out{font-size:.72rem;color:#FF6B6B;text-align:center;font-weight:700;padding:3px 5px;letter-spacing:.03em;line-height:1.35}
+.prize-edit-input{width:100%;padding:3px 6px;background:rgba(255,255,255,.12);border:1px solid rgba(255,215,0,.5);border-radius:5px;color:#fff;font-size:.74rem;font-family:inherit;text-align:center;outline:none}
+
+/* ── RESULT MODAL ── */
+#result-modal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(6px)}
+#result-modal.show{opacity:1;pointer-events:all}
+.res-card{background:linear-gradient(135deg,#1a0830,#2a1050);border:2px solid rgba(255,215,0,.4);border-radius:20px;padding:34px;text-align:center;max-width:310px;width:90%;box-shadow:0 0 50px rgba(255,215,0,.2),0 20px 60px rgba(0,0,0,.6);transform:scale(.8);transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+#result-modal.show .res-card{transform:scale(1)}
+.res-ball{width:90px;height:90px;border-radius:50%;margin:0 auto 16px;box-shadow:inset -10px -10px 22px rgba(0,0,0,.4),inset 5px 5px 16px rgba(255,255,255,.4),0 0 35px rgba(255,215,0,.25);animation:rpulse 2s ease-in-out infinite}
+@keyframes rpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.res-congrats{font-size:.88rem;color:rgba(255,220,150,.9);margin-bottom:5px;letter-spacing:.12em}
+.res-name{font-size:1.6rem;font-weight:900;color:#FFD700;margin-bottom:10px;text-shadow:0 0 18px rgba(255,215,0,.5)}
+.res-prize-lbl{font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:4px}
+.res-prize{font-size:1.15rem;font-weight:700;color:#fff;margin-bottom:20px;padding:8px 16px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);border-radius:9px}
+.res-close{padding:10px 32px;background:linear-gradient(135deg,#bb0000,#ff2222);color:#fff;border:2px solid rgba(255,255,255,.3);border-radius:26px;font-size:.92rem;font-family:inherit;cursor:pointer;font-weight:700;transition:all .2s}
+.res-close:hover{transform:translateY(-2px);box-shadow:0 5px 16px rgba(180,0,0,.4)}
+
+/* ── CONFETTI ── */
+.confetti{position:fixed;pointer-events:none;z-index:99;animation:cfall linear forwards}
+@keyframes cfall{0%{transform:translateY(-20px) rotate(0);opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:0}}
+
+/* ── ADMIN ── */
+#admin-toggle{position:fixed;top:14px;right:14px;z-index:50;width:36px;height:36px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.4);transition:all .2s}
+#admin-toggle:hover{background:rgba(255,255,255,.18);color:rgba(255,255,255,.9)}
+#admin-login{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.82);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .3s}
+#admin-login.show{opacity:1;pointer-events:all}
+.login-box{background:linear-gradient(135deg,#1a0830,#2a1050);border:2px solid rgba(255,215,0,.3);border-radius:14px;padding:28px;width:90%;max-width:290px;text-align:center}
+.login-box h2{color:#FFD700;margin-bottom:16px;font-size:1.05rem}
+.login-inp{width:100%;padding:10px 13px;background:rgba(255,255,255,.09);border:1px solid rgba(255,215,0,.3);border-radius:7px;color:#fff;font-size:.95rem;font-family:inherit;margin-bottom:12px;outline:none}
+.login-inp:focus{border-color:rgba(255,215,0,.65)}
+.login-err{color:#FF6B6B;font-size:.8rem;min-height:17px;margin-bottom:9px}
+.btn-p{width:100%;padding:10px;background:linear-gradient(135deg,#bb0000,#ff2222);color:#fff;border:none;border-radius:7px;font-size:.92rem;font-family:inherit;cursor:pointer;font-weight:700;margin-bottom:6px;transition:all .2s}
+.btn-p:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(180,0,0,.4)}
+.btn-s{width:100%;padding:8px;background:transparent;color:rgba(255,255,255,.52);border:1px solid rgba(255,255,255,.18);border-radius:7px;font-size:.85rem;font-family:inherit;cursor:pointer;transition:all .2s}
+.btn-s:hover{background:rgba(255,255,255,.09);color:rgba(255,255,255,.9)}
+#admin-panel{position:fixed;inset:0;z-index:150;background:#0d0520;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .3s}
+#admin-panel.show{opacity:1;pointer-events:all}
+.adm-hdr{background:linear-gradient(135deg,#1a0830,#2a0550);padding:13px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,215,0,.2);position:sticky;top:0;z-index:10}
+.adm-hdr h1{color:#FFD700;font-size:1.05rem}
+.adm-close{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.adm-close:hover{background:rgba(255,80,80,.3)}
+.adm-body{padding:20px;max-width:840px;margin:0 auto}
+.adm-sec{margin-bottom:26px}
+.adm-sec h2{color:#FFD700;font-size:.92rem;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid rgba(255,215,0,.2)}
+.tbl-wrap{overflow-x:auto}
+.adm-tbl{width:100%;border-collapse:collapse;font-size:.82rem}
+.adm-tbl th{background:rgba(255,215,0,.09);color:rgba(255,215,0,.85);padding:8px 10px;text-align:left;font-weight:normal;border-bottom:1px solid rgba(255,215,0,.18)}
+.adm-tbl td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.05);color:rgba(255,255,255,.82);vertical-align:middle}
+.adm-tbl tr:hover td{background:rgba(255,255,255,.03)}
+.cp{width:24px;height:24px;border-radius:50%;box-shadow:inset -3px -3px 5px rgba(0,0,0,.4),inset 2px 2px 4px rgba(255,255,255,.4)}
+.ti{width:66px;padding:5px 6px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);border-radius:5px;color:#fff;font-size:.8rem;font-family:inherit;text-align:center}
+.ti:focus{outline:none;border-color:rgba(255,215,0,.5)}
+.ti.wide{width:136px;text-align:left}
+.toggle{position:relative;display:inline-block;width:40px;height:22px}
+.toggle input{opacity:0;width:0;height:0}
+.tgl-sl{position:absolute;cursor:pointer;inset:0;background:rgba(255,255,255,.14);border-radius:22px;transition:.3s;border:1px solid rgba(255,255,255,.18)}
+.tgl-sl::before{position:absolute;content:'';height:16px;width:16px;left:2px;bottom:2px;background:rgba(255,255,255,.5);border-radius:50%;transition:.3s}
+.toggle input:checked+.tgl-sl{background:#4CAF50;border-color:#4CAF50}
+.toggle input:checked+.tgl-sl::before{transform:translateX(18px);background:#fff}
+.save-btn{padding:8px 20px;background:linear-gradient(135deg,#4CAF50,#2e7d32);color:#fff;border:none;border-radius:7px;font-size:.85rem;font-family:inherit;cursor:pointer;font-weight:700;transition:all .2s}
+.save-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(76,175,80,.4)}
+.hist-empty{color:rgba(255,255,255,.38);text-align:center;padding:16px;font-size:.8rem}
+#status{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.72);border:1px solid rgba(255,215,0,.2);border-radius:18px;padding:7px 17px;font-size:.76rem;color:rgba(255,215,0,.85);z-index:20;backdrop-filter:blur(5px);white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none}
+#status.show{opacity:1}
+@media(max-width:460px){.base-board{width:calc(100vw - 12px)}.prize-section{width:calc(100vw - 12px)}.prize-grid{grid-template-columns:repeat(2,1fr)}.oct-wrap{width:190px;height:190px}.stand-svg{width:240px}.btn-row{gap:8px}#start-btn{padding:12px 22px;font-size:1rem}#reset-btn{padding:11px 16px;font-size:.88rem}}
+</style>
+</head>
+<body>
+
+<div class="fest-bg" id="fest-bg"></div>
+
+<!-- ══════════════════════════════════════════════════
+     店號登入畫面（一開始顯示）
+     ══════════════════════════════════════════════════ -->
+<div id="store-login">
+  <div class="store-login-box">
+    <div class="store-login-logo">🏮</div>
+    <div class="store-login-title">MOS夏日祭典活動抽獎</div>
+    <div class="store-login-sub">Lucky Draw · 幸運抽獎</div>
+    <div class="store-login-divider"></div>
+    <div class="store-login-hint">請輸入店號（001 ～ 500）</div>
+    <input type="text" id="store-num-inp" class="login-inp"
+           placeholder="例如：001" maxlength="3"
+           oninput="this.value=this.value.replace(/\D/g,'')"
+           onkeydown="if(event.key==='Enter')doStoreLogin()">
+    <div class="login-err" id="store-err"></div>
+    <button class="btn-p" onclick="doStoreLogin()">✨ 確認登入</button>
+    <div class="store-login-deco">
+      <span class="store-deco-star">★</span>
+      <span class="store-deco-star">★</span>
+      <span class="store-deco-star">★</span>
+    </div>
+  </div>
+</div>
+
+<!-- 店號標章（登入後顯示） -->
+<div class="store-badge" id="store-badge" style="display:none"></div>
+
+<!-- ══════════════════════════════════════════════════
+     主畫面（登入後顯示）
+     ══════════════════════════════════════════════════ -->
+<div class="main" id="main-app" style="display:none">
+  <div class="title">
+    <h1 id="page-title"></h1>
+    <div class="sub">Lucky Draw · 幸運抽獎</div>
+  </div>
+
+  <div class="machine-outer">
+    <div class="drum-crank-row">
+      <div class="drum-spacer"></div>
+      <div class="oct-wrap" id="drum-wrap">
+        <div id="drum-inner">
+          <div class="drum-sticker">
+            <svg viewBox="0 0 54 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 22 A23 23 0 0 1 50 22" fill="none" stroke="#aaa" stroke-width="1.5"/>
+              <line x1="27" y1="21" x2="27" y2="6" stroke="#cc1100" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="27" cy="21" r="2.5" fill="#888"/>
+              <text x="5" y="21" font-size="6" fill="#888" font-family="sans-serif">L</text>
+              <text x="43" y="21" font-size="6" fill="#888" font-family="sans-serif">H</text>
+            </svg>
+          </div>
+          <div class="drum-window">
+            <div class="drum-mesh"></div>
+            <div class="drum-balls-layer" id="drum-balls"></div>
+            <div class="drum-win-shine"></div>
+          </div>
+        </div>
+        <svg class="oct-frame-svg" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="wf" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#a07830"/><stop offset="40%" stop-color="#d4a840"/>
+              <stop offset="60%" stop-color="#805808"/><stop offset="100%" stop-color="#a07830"/>
+            </linearGradient>
+            <linearGradient id="axG" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#d4c060"/><stop offset="50%" stop-color="#907010"/>
+              <stop offset="100%" stop-color="#c09020"/>
+            </linearGradient>
+          </defs>
+          <polygon points="65,1 155,1 219,65 219,155 155,219 65,219 1,155 1,65" fill="none" stroke="url(#wf)" stroke-width="5.5"/>
+          <polygon points="71,7 149,7 213,71 213,149 149,213 71,213 7,149 7,71" fill="none" stroke="rgba(220,180,80,.18)" stroke-width="1.5"/>
+          <circle cx="110" cy="110" r="13" fill="url(#axG)"/>
+          <circle cx="110" cy="110" r="8" fill="#6a4808"/>
+          <circle cx="110" cy="110" r="3.5" fill="#2a1600"/>
+          <circle cx="107" cy="107" r="1.8" fill="rgba(255,215,100,.38)"/>
+        </svg>
+        <div class="exit-hole"></div>
+      </div>
+      <div class="crank-wrap">
+        <div class="crank-shaft"></div>
+        <div class="crank-arm" id="crank-arm"></div>
+        <div class="crank-knob"></div>
+      </div>
+    </div>
+
+    <div class="base-board">
+      <div class="board-inner">
+        <div class="bell-col">
+          <div class="bell-wrap" id="bell-wrap" onclick="ringBell()">
+            <svg class="bell-svg" viewBox="0 0 52 82" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="bellG" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#906010"/><stop offset="22%" stop-color="#d4a020"/>
+                  <stop offset="48%" stop-color="#ffd700"/><stop offset="74%" stop-color="#c09020"/>
+                  <stop offset="100%" stop-color="#785008"/>
+                </linearGradient>
+              </defs>
+              <rect x="22" y="0" width="8" height="13" rx="4" fill="#111"/>
+              <rect x="24" y="1" width="4" height="5" rx="2" fill="#333"/>
+              <path d="M 26 11 Q 11 14 8 32 L 4 54 Q 3 64 26 66 Q 49 64 48 54 L 44 32 Q 41 14 26 11 Z" fill="url(#bellG)"/>
+              <ellipse cx="26" cy="66" rx="23" ry="7" fill="#c09020"/>
+              <ellipse cx="26" cy="66" rx="19" ry="5" fill="#907010"/>
+              <path d="M 14 22 Q 12 38 15 54" stroke="rgba(255,255,200,.32)" stroke-width="5" fill="none" stroke-linecap="round"/>
+              <line x1="26" y1="66" x2="26" y2="76" stroke="#6a4808" stroke-width="2.5"/>
+              <circle cx="26" cy="78" r="4.5" fill="#6a4808"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="stand-col">
+          <svg class="stand-svg" viewBox="0 0 270 155" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="met" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#555"/><stop offset="18%" stop-color="#999"/>
+                <stop offset="42%" stop-color="#d8d8d8"/><stop offset="58%" stop-color="#e6e6e6"/>
+                <stop offset="82%" stop-color="#999"/><stop offset="100%" stop-color="#555"/>
+              </linearGradient>
+              <linearGradient id="metV" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#aaa"/><stop offset="40%" stop-color="#ddd"/>
+                <stop offset="100%" stop-color="#777"/>
+              </linearGradient>
+              <filter id="ds"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity=".38"/></filter>
+            </defs>
+            <path d="M 133 16 Q 90 46 60 96 Q 42 124 38 148" fill="none" stroke="url(#met)" stroke-width="24" stroke-linecap="round" filter="url(#ds)"/>
+            <path d="M 135 18 Q 93 48 63 97 Q 45 124 41 148" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="7" stroke-linecap="round"/>
+            <path d="M 137 16 Q 180 46 210 96 Q 228 124 232 148" fill="none" stroke="url(#met)" stroke-width="24" stroke-linecap="round" filter="url(#ds)"/>
+            <path d="M 135 18 Q 177 48 207 97 Q 225 124 229 148" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="7" stroke-linecap="round"/>
+            <path d="M 108 17 Q 135 3 162 17" fill="none" stroke="url(#met)" stroke-width="20" stroke-linecap="round"/>
+            <path d="M 22 148 Q 38 162 58 148" fill="none" stroke="url(#met)" stroke-width="20" stroke-linecap="round"/>
+            <path d="M 212 148 Q 232 162 248 148" fill="none" stroke="url(#met)" stroke-width="20" stroke-linecap="round"/>
+            <text x="135" y="70" text-anchor="middle" fill="#aaa" font-size="13" font-family="sans-serif">★  ★</text>
+            <text x="135" y="92" text-anchor="middle" fill="#bbb" font-size="16" font-family="sans-serif">★ ★ ★</text>
+            <text x="135" y="113" text-anchor="middle" fill="#aaa" font-size="13" font-family="sans-serif">★  ★</text>
+            <circle cx="135" cy="16" r="15" fill="url(#metV)" filter="url(#ds)"/>
+            <circle cx="135" cy="16" r="9" fill="#888"/>
+            <circle cx="135" cy="16" r="4" fill="#555"/>
+            <rect x="135" y="12" width="62" height="8" rx="4" fill="url(#met)"/>
+          </svg>
+        </div>
+
+        <div class="tray-col">
+          <div id="result-ball-wrap"><div id="result-ball"></div></div>
+          <svg class="tray-svg" viewBox="0 0 84 52" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="trayG" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#FFE066"/><stop offset="40%" stop-color="#c9a227"/>
+                <stop offset="100%" stop-color="#7a5800"/>
+              </linearGradient>
+            </defs>
+            <ellipse cx="42" cy="49" rx="40" ry="5" fill="rgba(0,0,0,.28)"/>
+            <path d="M 4 26 Q 5 46 42 50 Q 79 46 80 26 Z" fill="url(#trayG)"/>
+            <ellipse cx="42" cy="26" rx="38" ry="11" fill="#FFD700"/>
+            <ellipse cx="42" cy="26" rx="34" ry="8" fill="rgba(80,45,0,.22)"/>
+            <ellipse cx="28" cy="23" rx="12" ry="4" fill="rgba(255,255,190,.28)"/>
+            <circle cx="28" cy="24" r="6" fill="rgba(255,255,255,.7)" stroke="rgba(200,200,200,.5)" stroke-width="1"/>
+            <circle cx="42" cy="22" r="6" fill="rgba(255,255,255,.7)" stroke="rgba(200,200,200,.5)" stroke-width="1"/>
+            <circle cx="56" cy="24" r="6" fill="rgba(255,255,255,.7)" stroke="rgba(200,200,200,.5)" stroke-width="1"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 抽獎按鈕 -->
+  <div class="btn-row">
+    <button id="reset-btn" onclick="resetDraw()">↺ 重新抽獎</button>
+    <button id="start-btn" onclick="startLottery()">
+      <span id="start-btn-text">開始抽獎</span>
+      <!-- 日式蘋果糖 りんご飴 -->
+      <svg class="btn-candy" width="22" height="32" viewBox="0 0 22 32" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="aplR" cx="38%" cy="30%" r="65%">
+            <stop offset="0%" stop-color="#FF9999"/>
+            <stop offset="45%" stop-color="#EE1111"/>
+            <stop offset="100%" stop-color="#880000"/>
+          </radialGradient>
+          <radialGradient id="aplSh" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="rgba(255,255,255,.0)"/>
+            <stop offset="100%" stop-color="rgba(0,0,0,.15)"/>
+          </radialGradient>
+        </defs>
+        <rect x="9" y="19" width="4" height="13" rx="2" fill="#7a4a20"/>
+        <rect x="10" y="19" width="1.5" height="13" rx=".75" fill="rgba(255,200,150,.3)"/>
+        <circle cx="11" cy="11" r="10" fill="url(#aplR)"/>
+        <circle cx="11" cy="11" r="10" fill="url(#aplSh)"/>
+        <ellipse cx="7.5" cy="6.5" rx="3" ry="4.2" fill="rgba(255,255,255,.42)" transform="rotate(-20,7.5,6.5)"/>
+        <ellipse cx="15" cy="15" rx="1.5" ry="2.2" fill="rgba(255,255,255,.15)" transform="rotate(-20,15,15)"/>
+        <path d="M 11 2 Q 16.5 -1.5 18 3 Q 15 7 11 5 Z" fill="#2a9020"/>
+        <path d="M 11 2 Q 8 0.5 11 5" fill="none" stroke="#1a6010" stroke-width="1" stroke-linecap="round"/>
+        <line x1="11" y1="1" x2="11" y2="3" stroke="#5a3008" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M 18 12 Q 21 14 20 17 Q 19 19 18 17" fill="#cc0808" opacity=".6"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- 獎品一覽 -->
+  <div class="prize-section">
+    <div class="prize-section-title">🎁 獎品一覽</div>
+    <div class="prize-grid" id="prize-grid"></div>
+  </div>
+</div>
+
+<!-- 結果彈窗 -->
+<div id="result-modal">
+  <div class="res-card">
+    <div class="res-ball" id="res-ball-display"></div>
+    <div class="res-congrats">おめでとうございます！</div>
+    <div class="res-name" id="res-ball-name"></div>
+    <div class="res-prize-lbl">獎品</div>
+    <div class="res-prize" id="res-prize-name"></div>
+    <button class="res-close" onclick="closeResult()">再抽一次</button>
+  </div>
+</div>
+
+<!-- 後台齒輪按鈕（登入後才顯示） -->
+<button id="admin-toggle" onclick="openAdminLogin()" title="管理後台" style="display:none">⚙️</button>
+
+<!-- 後台密碼驗證 -->
+<div id="admin-login">
+  <div class="login-box">
+    <h2>🔐 後台管理</h2>
+    <input type="password" class="login-inp" id="login-pw" placeholder="請輸入管理員密碼" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="login-err" id="login-err"></div>
+    <button class="btn-p" onclick="doLogin()">登入</button>
+    <button class="btn-s" onclick="closeAdminLogin()">取消</button>
+  </div>
+</div>
+
+<!-- 後台管理面板 -->
+<div id="admin-panel">
+  <div class="adm-hdr">
+    <h1 id="adm-title">⚙️ 後台管理系統</h1>
+    <button class="adm-close" onclick="closeAdmin()">✕</button>
+  </div>
+  <div class="adm-body">
+    <div class="adm-sec">
+      <h2>球種設定</h2>
+      <div class="tbl-wrap">
+        <table class="adm-tbl">
+          <thead><tr><th>顏色</th><th>名稱</th><th>權重</th><th>啟用</th><th>獎品名稱</th><th>庫存</th></tr></thead>
+          <tbody id="adm-balls-body"></tbody>
+        </table>
+      </div>
+      <br>
+      <button class="save-btn" onclick="saveAdmin()">💾 儲存設定</button>
+    </div>
+    <div class="adm-sec">
+      <h2>機率預覽</h2>
+      <div id="adm-stats"></div>
+    </div>
+    <div class="adm-sec">
+      <h2>抽獎紀錄（最近 20 筆）</h2>
+      <div class="tbl-wrap">
+        <table class="adm-tbl">
+          <thead><tr><th>時間</th><th>球種</th><th>獎品</th></tr></thead>
+          <tbody id="adm-hist-body"></tbody>
+        </table>
+      </div>
+      <br>
+      <button class="btn-s" style="width:auto;padding:7px 14px;color:#FF6B6B;border-color:#FF6B6B" onclick="clearHist()">清除紀錄</button>
+    </div>
+    <div class="adm-sec">
+      <h2>系統</h2>
+      <button class="btn-s" style="width:auto;padding:8px 16px;color:#FF6B6B;border-color:#FF6B6B" onclick="resetDefault()">重設為預設值</button>
+    </div>
+  </div>
+</div>
+
+<div id="status"></div>
+
+<script>
+/* ╔══════════════════════════════════════════════════════════════════════╗
+   ║   🍎  可修改設定區  ── 新手請在這裡修改，不需動其他地方！        ║
+   ╚══════════════════════════════════════════════════════════════════════╝
+
+   說明：
+   - SITE_TITLE   : 網頁主標題
+   - ADMIN_PASS   : 後台管理密碼（右上角齒輪圖示）
+   - BALL_CONFIG  : 六種球的設定
+       name      = 球的名稱（不要改，否則顏色會對不上）
+       prizeName = 獎品名稱
+       weight    = 抽中機率權重（數字越大越容易中，只看相對比例）
+       stock     = 庫存數量（抽完自動停用，並顯示「獎項已抽完」）
+*/
+
+// ── 網頁標題 ────────────────────────────────────────────────────────────
+const SITE_TITLE = 'MOS夏日祭典活動抽獎';
+
+// ── 後台管理員密碼 ──────────────────────────────────────────────────────
+const ADMIN_PASS = 'admin2024';
+
+// ── 球種設定（共六種，顏色固定，可修改獎品名稱/機率/庫存）──────────────
+const BALL_CONFIG = [
+  //  name      prizeName              weight   stock
+  { name: '白球', prizeName: '套餐優惠券(A)', weight: 25, stock: 9999 },
+  { name: '藍球', prizeName: '套餐優惠券(B)', weight: 25, stock: 9999 },
+  { name: '橘球', prizeName: '點心優惠券',    weight: 15, stock: 3000 },
+  { name: '紅球', prizeName: '飲品優惠券',    weight: 15, stock: 3000 },
+  { name: '綠球', prizeName: 'MF祭典扇子',    weight: 10, stock:  300 },
+  { name: '金球', prizeName: 'MF造型磁鐵',   weight: 10, stock:  100 },
+];
+
+/* ══════════════════════════════════════════════════════════════════════
+   以下為程式本體，新手請勿修改
+   ══════════════════════════════════════════════════════════════════════ */
+
+// 六種球的固定顏色（與 BALL_CONFIG 順序對應）
+const BALL_COLORS = [
+  { id:'white',  grad:'radial-gradient(circle at 35% 32%,#FFFFFF,#A0A0A0)' },
+  { id:'blue',   grad:'radial-gradient(circle at 35% 32%,#80CCFF,#1155BB)' },
+  { id:'orange', grad:'radial-gradient(circle at 35% 32%,#FFD870,#CC5500)' },
+  { id:'red',    grad:'radial-gradient(circle at 35% 32%,#FF6666,#880000)' },
+  { id:'green',  grad:'radial-gradient(circle at 35% 32%,#80EE80,#1A5C1A)' },
+  { id:'gold',   grad:'radial-gradient(circle at 35% 32%,#FFFF80,#AA7700)' },
+];
+
+// 將 BALL_CONFIG 合併顏色資訊，產生完整的預設球設定
+function buildDefaults(){
+  return BALL_CONFIG.map((c,i)=>({
+    id:        BALL_COLORS[i].id,
+    name:      c.name,
+    grad:      BALL_COLORS[i].grad,
+    weight:    c.weight,
+    enabled:   true,
+    prizeName: c.prizeName,
+    stock:     c.stock,
+  }));
+}
+const DEF = buildDefaults();
+
+// 目前登入的店號（登入後設定）
+let currentStore = null;
+let balls = [];
+let hist  = [];
+let busy  = false;
+
+// ── 每間店獨立的 localStorage 鍵值 ──────────────────────────────────────
+function getCfgKey(){ return `garapon_${currentStore}_cfg`; }
+function getHistKey(){ return `garapon_${currentStore}_hist`; }
+
+function loadCfg(){
+  try{
+    const s = localStorage.getItem(getCfgKey());
+    if(s) return JSON.parse(s);
+  }catch(e){}
+  // 第一次登入 → 使用上方 BALL_CONFIG 預設值
+  return JSON.parse(JSON.stringify(DEF));
+}
+function saveCfg(){
+  localStorage.setItem(getCfgKey(), JSON.stringify(balls));
+}
+function loadHist(){
+  try{
+    const s = localStorage.getItem(getHistKey());
+    if(s) return JSON.parse(s);
+  }catch(e){}
+  return [];
+}
+function saveHist(){
+  localStorage.setItem(getHistKey(), JSON.stringify(hist.slice(0, 100)));
+}
+
+// ── 店號登入 ──────────────────────────────────────────────────────────────
+function doStoreLogin(){
+  const raw = document.getElementById('store-num-inp').value.trim();
+  const num = parseInt(raw, 10);
+  if(!raw || isNaN(num) || num < 1 || num > 500){
+    document.getElementById('store-err').textContent = '請輸入 001 ～ 500 之間的有效店號';
+    return;
+  }
+  currentStore = String(num).padStart(3, '0');
+  sessionStorage.setItem('garapon_store', currentStore);
+  balls = loadCfg();
+  hist  = loadHist();
+  initApp();
+}
+
+function initApp(){
+  document.getElementById('store-login').style.display = 'none';
+  document.getElementById('main-app').style.display    = '';
+  document.getElementById('admin-toggle').style.display = '';
+  const badge = document.getElementById('store-badge');
+  badge.textContent = `🏪 ${currentStore} 店`;
+  badge.style.display = '';
+  document.title = SITE_TITLE;
+  document.getElementById('page-title').innerHTML = `🏮 ${SITE_TITLE} 🏮`;
+  renderDrum();
+  renderPrizeGrid();
+}
+
+// ── PICK（加權隨機）──────────────────────────────────────────────────────
+function pick(){
+  const av = balls.filter(b => b.enabled && b.stock > 0);
+  if(!av.length) return null;
+  const tot = av.reduce((s,b) => s + b.weight, 0);
+  let r = Math.random() * tot;
+  for(const b of av){ if(r < b.weight) return b; r -= b.weight; }
+  return av[av.length - 1];
+}
+
+// ── 滾筒球顯示 ───────────────────────────────────────────────────────────
+function renderDrum(){
+  const layer = document.getElementById('drum-balls');
+  layer.innerHTML = '';
+  const pts = [[.3,.3],[.68,.24],[.5,.5],[.22,.62],[.72,.65],[.44,.76],[.62,.38],[.3,.46],[.66,.55],[.5,.2],[.2,.76],[.78,.42],[.4,.62],[.55,.34],[.26,.52],[.72,.3]];
+  const active = balls.filter(b => b.enabled && b.stock > 0);
+  if(!active.length) return;
+  const W = 118;
+  pts.forEach((p,i) => {
+    const x=p[0]*W, y=p[1]*W, dx=x-W/2, dy=y-W/2;
+    if(Math.sqrt(dx*dx+dy*dy) > 50) return;
+    const ball = active[i % active.length];
+    const el = document.createElement('div');
+    el.className = 'ball-in-drum';
+    el.style.cssText = `left:${x}px;top:${y}px;background:${ball.grad}`;
+    layer.appendChild(el);
+  });
+}
+
+// ── 獎品卡片 ─────────────────────────────────────────────────────────────
+function renderPrizeGrid(){
+  const grid = document.getElementById('prize-grid');
+  grid.innerHTML = '';
+  balls.forEach(b => {
+    const soldOut = b.stock <= 0;
+    const on      = b.enabled && !soldOut;
+    const card    = document.createElement('div');
+    card.className = 'pcard' + (on ? '' : ' off');
+    card.dataset.ballId = b.id;
+
+    // 庫存歸零 → 顯示「獎項已抽完」提示
+    const prizePart = soldOut
+      ? `<span class="pcard-sold-out">🚫 獎項已抽完</span>`
+      : `<span class="pcard-prize">${b.prizeName}</span>
+         <button class="pcard-edit-btn" title="編輯獎品">✏️</button>`;
+
+    card.innerHTML = `
+      <div class="pcard-ball" style="background:${b.grad}"></div>
+      <div class="pcard-name">${b.name}</div>
+      <div class="pcard-prize-wrap">${prizePart}</div>
+    `;
+
+    if(!soldOut){
+      const prizeSpan = card.querySelector('.pcard-prize');
+      const editBtn   = card.querySelector('.pcard-edit-btn');
+      prizeSpan.addEventListener('click', () => editPrize(prizeSpan, b.id));
+      editBtn.addEventListener('click',   () => editPrize(prizeSpan, b.id));
+    }
+    grid.appendChild(card);
+  });
+}
+
+function editPrize(spanEl, ballId){
+  if(spanEl.tagName === 'INPUT') return;
+  const current = spanEl.textContent;
+  const input = document.createElement('input');
+  input.type = 'text'; input.value = current; input.className = 'prize-edit-input';
+  spanEl.replaceWith(input);
+  input.focus(); input.select();
+  const save = () => {
+    const val = input.value.trim() || current;
+    const span = document.createElement('span');
+    span.className = 'pcard-prize'; span.textContent = val;
+    span.addEventListener('click', () => editPrize(span, ballId));
+    input.replaceWith(span);
+    const idx = balls.findIndex(b => b.id === ballId);
+    if(idx >= 0){ balls[idx].prizeName = val; saveCfg(); }
+    showStatus('獎品已更新！');
+  };
+  input.addEventListener('blur', save);
+  input.addEventListener('keydown', e => {
+    if(e.key === 'Enter'){ e.preventDefault(); save(); }
+    if(e.key === 'Escape'){
+      const span = document.createElement('span');
+      span.className = 'pcard-prize'; span.textContent = current;
+      span.addEventListener('click', () => editPrize(span, ballId));
+      input.replaceWith(span);
+    }
+  });
+}
+
+// ── 抽獎主程序 ───────────────────────────────────────────────────────────
+async function startLottery(){
+  if(busy) return;
+  if(!balls.some(b => b.enabled && b.stock > 0)){
+    showStatus('所有獎品已抽完！'); return;
+  }
+  busy = true;
+  const btn = document.getElementById('start-btn');
+  btn.disabled = true;
+  document.getElementById('start-btn-text').textContent = '抽獎中…';
+
+  const result = pick();
+  document.getElementById('crank-arm').classList.add('push');
+  setTimeout(() => document.getElementById('crank-arm').classList.remove('push'), 550);
+
+  const drumInner = document.getElementById('drum-inner');
+  const deg = 360 * (2.5 + Math.random());
+  const dur = 2800 + Math.random() * 600;
+  const anim = drumInner.animate(
+    [{transform:'rotate(0deg)'},{transform:`rotate(${deg}deg)`}],
+    {duration:dur, easing:'cubic-bezier(0.4,0,0.15,1)', fill:'forwards'}
+  );
+  playSpinSound(dur);
+  await anim.finished;
+  await sleep(180);
+
+  const wrap = document.getElementById('result-ball-wrap');
+  const rb   = document.getElementById('result-ball');
+  rb.style.background = result.grad;
+  wrap.style.opacity  = '1';
+  rb.classList.add('pop');
+
+  ringBell();
+  playWinSound();
+
+  const idx = balls.findIndex(b => b.id === result.id);
+  if(idx >= 0){
+    balls[idx].stock = Math.max(0, balls[idx].stock - 1);
+    if(balls[idx].stock === 0){
+      balls[idx].enabled = false;
+      setTimeout(() => showStatus(`${result.name} 庫存已用完，自動停用`), 800);
+    }
+    saveCfg();
+  }
+  hist.unshift({
+    time:      new Date().toLocaleString('zh-TW'),
+    ballId:    result.id,
+    ballName:  result.name,
+    ballGrad:  result.grad,
+    prizeName: result.prizeName,
+  });
+  saveHist();
+
+  await sleep(700);
+  showResult(result);
+  renderDrum(); renderPrizeGrid();
+  busy = false;
+}
+
+function showResult(r){
+  document.getElementById('res-ball-display').style.background = r.grad;
+  document.getElementById('res-ball-name').textContent  = `恭喜抽中 ${r.name}！`;
+  document.getElementById('res-prize-name').textContent = r.prizeName;
+  document.getElementById('result-modal').classList.add('show');
+  spawnConfetti(r.grad);
+}
+
+function closeResult(){
+  document.getElementById('result-modal').classList.remove('show');
+  document.getElementById('result-ball').classList.remove('pop');
+  document.getElementById('result-ball-wrap').style.opacity = '0';
+  document.querySelectorAll('.confetti').forEach(e => e.remove());
+  const btn = document.getElementById('start-btn');
+  btn.disabled = false;
+  document.getElementById('start-btn-text').textContent = '開始抽獎';
+}
+
+function resetDraw(){
+  document.getElementById('drum-inner').getAnimations().forEach(a => a.cancel());
+  busy = false;
+  document.getElementById('result-modal').classList.remove('show');
+  document.getElementById('result-ball').classList.remove('pop');
+  document.getElementById('result-ball-wrap').style.opacity = '0';
+  document.querySelectorAll('.confetti').forEach(e => e.remove());
+  const btn = document.getElementById('start-btn');
+  btn.disabled = false;
+  document.getElementById('start-btn-text').textContent = '開始抽獎';
+  showStatus('已重設，可重新抽獎');
+}
+
+// ── 鈴鐺 ─────────────────────────────────────────────────────────────────
+function ringBell(){
+  const w = document.getElementById('bell-wrap');
+  w.classList.remove('bell-ringing');
+  void w.offsetWidth;
+  w.classList.add('bell-ringing');
+  w.addEventListener('animationend', () => w.classList.remove('bell-ringing'), {once:true});
+  playBellSound();
+}
+
+// ── 彩紙 ─────────────────────────────────────────────────────────────────
+function spawnConfetti(grad){
+  const colors = ['#FFD700','#FF6B6B','#4CAF50','#4A90D9','#F5A623','#fff','#FF99CC'];
+  for(let i=0;i<55;i++){
+    setTimeout(() => {
+      const el = document.createElement('div'); el.className = 'confetti';
+      const s  = 5 + Math.random() * 8;
+      el.style.cssText = `left:${Math.random()*100}vw;top:-14px;width:${s}px;height:${s}px;border-radius:${Math.random()>.5?'50%':'2px'};background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${1.3+Math.random()*2}s;animation-delay:${Math.random()*.35}s;`;
+      document.body.appendChild(el);
+      el.addEventListener('animationend', () => el.remove());
+    }, Math.random() * 280);
+  }
+}
+
+// ── 音效 ─────────────────────────────────────────────────────────────────
+let actx = null;
+function getACtx(){ if(!actx) actx = new(window.AudioContext||window.webkitAudioContext)(); return actx; }
+
+function playSpinSound(durMs){
+  try{
+    const ctx=getACtx(),dur=durMs/1000,sr=ctx.sampleRate;
+    const buf=ctx.createBuffer(1,sr*dur,sr),d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++){const t=i/sr,spd=Math.max(0,1-t/dur),f=8+spd*18;if((t*f)%1<0.06)d[i]=(Math.random()*2-1)*spd*.28;}
+    const src=ctx.createBufferSource(),g=ctx.createGain();
+    src.buffer=buf;g.gain.setValueAtTime(.32,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+dur);
+    src.connect(g);g.connect(ctx.destination);src.start();
+  }catch(e){}
+}
+
+function playBellSound(){
+  try{
+    const ctx=getACtx();
+    [[880,.38],[1320,.18],[2200,.08]].forEach(([f,gv])=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.frequency.value=f;o.type='sine';
+      g.gain.setValueAtTime(0,ctx.currentTime);
+      g.gain.linearRampToValueAtTime(gv,ctx.currentTime+.008);
+      g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+1.6);
+      o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+1.7);
+    });
+  }catch(e){}
+}
+
+function playWinSound(){
+  try{
+    const ctx=getACtx();
+    [523,659,784,1047].forEach((f,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime+i*.14;
+      o.frequency.value=f;o.type='sine';
+      g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.2,t+.05);g.gain.exponentialRampToValueAtTime(.001,t+.42);
+      o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+.45);
+    });
+  }catch(e){}
+}
+
+// ── 後台管理 ─────────────────────────────────────────────────────────────
+function openAdminLogin(){
+  document.getElementById('admin-login').classList.add('show');
+  document.getElementById('login-pw').value = '';
+  document.getElementById('login-err').textContent = '';
+  setTimeout(() => document.getElementById('login-pw').focus(), 100);
+}
+function closeAdminLogin(){ document.getElementById('admin-login').classList.remove('show'); }
+function doLogin(){
+  if(document.getElementById('login-pw').value === ADMIN_PASS){
+    closeAdminLogin(); openAdmin();
+  }else{
+    document.getElementById('login-err').textContent = '密碼錯誤';
+  }
+}
+function openAdmin(){
+  document.getElementById('adm-title').textContent = `⚙️ 後台管理 — ${currentStore} 店`;
+  document.getElementById('admin-panel').classList.add('show');
+  renderAdmTable(); renderAdmStats(); renderAdmHist();
+}
+function closeAdmin(){ document.getElementById('admin-panel').classList.remove('show'); }
+
+function renderAdmTable(){
+  const tb = document.getElementById('adm-balls-body');
+  tb.innerHTML = '';
+  balls.forEach(b => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><div class="cp" style="background:${b.grad}"></div></td>
+      <td style="color:rgba(255,255,255,.52)">${b.name}</td>
+      <td><input type="number" class="ti" data-id="${b.id}" data-f="weight" value="${b.weight}" min="1" max="999"></td>
+      <td><label class="toggle"><input type="checkbox" data-id="${b.id}" data-f="enabled" ${b.enabled?'checked':''}><span class="tgl-sl"></span></label></td>
+      <td><input type="text" class="ti wide" data-id="${b.id}" data-f="prizeName" value="${b.prizeName}"></td>
+      <td><input type="number" class="ti" data-id="${b.id}" data-f="stock" value="${b.stock}" min="0" max="99999"></td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function renderAdmStats(){
+  const el    = document.getElementById('adm-stats');
+  const total = balls.reduce((s,b) => s + (b.enabled && b.stock > 0 ? b.weight : 0), 0);
+  el.innerHTML = `<table class="adm-tbl"><thead><tr><th>球種</th><th>機率</th><th>庫存</th><th>狀態</th></tr></thead><tbody>
+    ${balls.map(b=>`<tr>
+      <td style="display:flex;align-items:center;gap:7px"><div class="cp" style="background:${b.grad};width:20px;height:20px"></div>${b.name}</td>
+      <td>${b.enabled&&b.stock>0&&total>0?((b.weight/total)*100).toFixed(1)+'%':'—'}</td>
+      <td>${b.stock}</td>
+      <td style="color:${b.enabled&&b.stock>0?'#4CAF50':'#FF6B6B'}">${b.enabled&&b.stock>0?'✅ 啟用':'❌ 停用'}</td>
+    </tr>`).join('')}
+    </tbody></table>
+    <div style="margin-top:9px;color:rgba(255,255,255,.38);font-size:.76rem">累計抽獎：${hist.length} 次</div>`;
+}
+
+function renderAdmHist(){
+  const tb = document.getElementById('adm-hist-body');
+  if(!hist.length){ tb.innerHTML='<tr><td colspan="3" class="hist-empty">尚無紀錄</td></tr>'; return; }
+  tb.innerHTML = hist.slice(0,20).map(h=>`<tr>
+    <td style="color:rgba(255,255,255,.4);font-size:.72rem">${h.time}</td>
+    <td><span style="display:inline-flex;align-items:center;gap:5px"><div style="width:13px;height:13px;border-radius:50%;background:${h.ballGrad};flex-shrink:0"></div>${h.ballName}</span></td>
+    <td style="color:rgba(255,220,150,.88)">${h.prizeName}</td>
+  </tr>`).join('');
+}
+
+function saveAdmin(){
+  document.querySelectorAll('[data-id]').forEach(inp => {
+    const idx = balls.findIndex(b => b.id === inp.dataset.id);
+    if(idx < 0) return;
+    const f = inp.dataset.f;
+    if(inp.type === 'checkbox') balls[idx][f] = inp.checked;
+    else if(f === 'weight' || f === 'stock') balls[idx][f] = Math.max(0, parseInt(inp.value) || 0);
+    else balls[idx][f] = inp.value;
+  });
+  balls.forEach(b => { if(b.stock === 0) b.enabled = false; });
+  saveCfg();
+  renderDrum(); renderPrizeGrid();
+  renderAdmTable(); renderAdmStats();
+  showStatus(`${currentStore} 店設定已儲存！`);
+}
+
+function clearHist(){
+  if(confirm('確定要清除此店所有抽獎紀錄嗎？')){
+    hist=[]; saveHist(); renderAdmHist(); renderAdmStats();
+  }
+}
+function resetDefault(){
+  if(confirm('確定要重設為預設值嗎？（此店的自訂設定將被清除）')){
+    balls = JSON.parse(JSON.stringify(DEF));
+    saveCfg(); renderDrum(); renderPrizeGrid();
+    renderAdmTable(); renderAdmStats();
+    showStatus('已重設為預設值');
+  }
+}
+
+// ── 祭典背景 ──────────────────────────────────────────────────────────────
+function buildBg(){
+  const bg = document.getElementById('fest-bg');
+  for(let i=0;i<88;i++){
+    const s=document.createElement('div'); s.className='star';
+    const sz=.4+Math.random()*2.2;
+    s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*62}%;left:${Math.random()*100}%;--d:${1.5+Math.random()*2}s;--delay:${Math.random()*3}s`;
+    bg.appendChild(s);
+  }
+  const gg=document.createElement('div'); gg.className='ground-glow'; bg.appendChild(gg);
+  const rope=document.createElement('div'); rope.className='lantern-rope'; bg.appendChild(rope);
+  const row=document.createElement('div'); row.className='lantern-row';
+  const cnt=Math.ceil(window.innerWidth/80)+2;
+  for(let i=0;i<cnt;i++){
+    const l=document.createElement('div'); l.className='lantern';
+    l.style.cssText=`--sd:${2.5+Math.random()*1.5}s;--delay:${Math.random()*3}s`;
+    l.innerHTML='<div class="lantern-top"></div><div class="lantern-body"></div><div class="lantern-tassel"></div>';
+    row.appendChild(l);
+  }
+  bg.appendChild(row);
+}
+
+let stTimer;
+function showStatus(msg){
+  const el=document.getElementById('status');
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(stTimer); stTimer=setTimeout(()=>el.classList.remove('show'),3000);
+}
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+// ── 初始化 ────────────────────────────────────────────────────────────────
+buildBg();
+
+// 若同一瀏覽器分頁本次已登入，直接進入（不需重新輸入店號）
+const _saved = sessionStorage.getItem('garapon_store');
+if(_saved){
+  const _n = parseInt(_saved, 10);
+  if(_n >= 1 && _n <= 500){
+    currentStore = _saved;
+    balls = loadCfg();
+    hist  = loadHist();
+    initApp();
+  }
+} else {
+  // 等待使用者輸入店號
+  setTimeout(() => {
+    const inp = document.getElementById('store-num-inp');
+    if(inp) inp.focus();
+  }, 100);
+}
+</script>
+</body>
+</html>
